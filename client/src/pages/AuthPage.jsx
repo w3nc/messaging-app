@@ -163,19 +163,23 @@ export default function AuthPage({ mode }) {
             </div>
           )}
 
-          <button className="btn btn--cta" type="submit" disabled={busy}>
-            {busy ? "Please wait..." : isSignup ? "Create account" : "Sign in"}
-          </button>
+          <div className="auth__actions">
+            <button className="btn btn--cta" type="submit" disabled={busy}>
+              {busy ? "Please wait..." : isSignup ? "Create account" : "Sign in"}
+            </button>
+            <span className="auth__or" aria-hidden="true">
+              or
+            </span>
+            <button
+              className="auth__guest"
+              type="button"
+              onClick={onGuest}
+              disabled={busy}
+            >
+              Continue without using an account
+            </button>
+          </div>
         </form>
-        or
-        <button
-          className="auth__guest"
-          type="button"
-          onClick={onGuest}
-          disabled={busy}
-        >
-          Continue without using an account
-        </button>
       </section>
     </main>
   );
