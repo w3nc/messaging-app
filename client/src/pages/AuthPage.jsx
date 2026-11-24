@@ -79,7 +79,6 @@ export default function AuthPage({ mode }) {
         <p className="auth__sub">
           Pick up your conversations where you left them.
         </p>
-
         <div
           className="auth__switch-tabs"
           role="tablist"
@@ -102,7 +101,6 @@ export default function AuthPage({ mode }) {
             Create account
           </Link>
         </div>
-
         <form className="auth__form" onSubmit={onSubmit} noValidate>
           {isSignup && (
             <>
@@ -169,7 +167,7 @@ export default function AuthPage({ mode }) {
             {busy ? "Please wait..." : isSignup ? "Create account" : "Sign in"}
           </button>
         </form>
-
+        or
         <button
           className="auth__guest"
           type="button"
