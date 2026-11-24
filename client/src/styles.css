@@ -389,13 +389,32 @@ li.hand,
   color: var(--muted);
   font-family: var(--font-ui);
   font-weight: 700;
-  margin-top: 32px;
+  margin-top: 0;
   cursor: pointer;
   text-align: center;
   padding: 0;
   transition: color var(--trans-fast);
 }
 .auth__guest:hover { color: var(--text); }
+
+.auth__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.auth__actions .btn--cta {
+  width: auto;
+}
+.auth__or {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
 .chat {
   display: grid;
