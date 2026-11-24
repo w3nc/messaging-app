@@ -22,11 +22,23 @@ function chatOther(convo, meId) {
 
 function Avatar({ person, name, size = 40 }) {
   const label = name || (person && person.displayName) || '?';
+  const isGuest = Boolean(person && person.isGuest);
   const style = {
     width: size,
     height: size,
     background: (person && person.avatarColor) || '#00a884',
   };
+  // Visitors get a grey anonymous silhouette, like Facebook's default avatar.
+  if (isGuest) {
+    return (
+      <span className="avatar" style={{ ...style, background: '#c4c7cc', border: 'none' }} role="img" aria-label="Anonymous">
+        <svg viewBox="0 0 24 24" width={size * 0.62} height={size * 0.62} aria-hidden="true">
+          <circle cx="12" cy="8.5" r="4.2" fill="#ffffff" />
+          <path d="M3.5 21.5c0-4.7 3.8-7.8 8.5-7.8s8.5 3.1 8.5 7.8z" fill="#ffffff" />
+        </svg>
+      </span>
+    );
+  }
   if (person && person.avatarUrl) {
     return <img className="avatar avatar--photo" style={{ width: size, height: size }} src={mediaUrl(person.avatarUrl)} alt="" />;
   }
