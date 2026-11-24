@@ -110,23 +110,43 @@ export default function ChatPage() {
   }, [conversationId]);
 
   // First load, then poll every 5 seconds to simulate live updates.
+  // Polling pauses while the tab is hidden and refreshes once when it comes back.
   useEffect(() => {
+    const refreshAll = () => {
+      loadConversations();
+      loadFriends();
+      if (conversationId) loadMessages();
+    };
     loadConversations();
     loadFriends();
-    const id = setInterval(loadConversations, POLL_MS);
-    const friendId = setInterval(loadFriends, POLL_MS);
-    return () => {
-      clearInterval(id);
-      clearInterval(friendId);
+    let id = null;
+    const start = () => {
+      if (id === null) id = setInterval(refreshAll, POLL_MS);
     };
-  }, [loadConversations, loadFriends]);
+    const stop = () => {
+      clearInterval(id);
+      id = null;
+    };
+    const onVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        refreshAll();
+        start();
+      }
+    };
+    if (!document.hidden) start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [conversationId, loadConversations, loadFriends, loadMessages]);
 
   useEffect(() => {
-    if (!conversationId) return undefined;
+    if (!conversationId) return;
     setMessages([]);
     loadMessages();
-    const id = setInterval(loadMessages, POLL_MS);
-    return () => clearInterval(id);
   }, [conversationId, loadMessages]);
 
   useEffect(() => {

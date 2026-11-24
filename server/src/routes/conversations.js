@@ -2,7 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { HttpError } = require('../lib/httpError');
 const { validateMessage, validateDirectChat, validateNewGroup, isAllowedImage } = require('../lib/validators');
-const { countUnread, messageTicks, previewText } = require('../lib/format');
+const { messageTicks, previewText } = require('../lib/format');
 const { requireAuth } = require('../middleware/auth');
 const { singleImage, anyFile } = require('../middleware/upload');
 const { saveImage, saveFile } = require('../lib/storage');
@@ -39,26 +39,28 @@ router.get('/conversations', requireAuth, async (req, res, next) => {
       },
     });
 
-    const result = await Promise.all(
-      conversations.map(async (c) => {
-        const unread = await prisma.message.findMany({
-          where: { conversationId: c.id, senderId: { not: me }, readAt: null },
-          select: { senderId: true, readAt: true },
-        });
-        const last = c.messages[0] || null;
-        return {
-          id: c.id,
-          isGroup: c.isGroup,
-          isGlobal: c.isGlobal,
-          name: c.name,
-          createdAt: c.createdAt,
-          members: c.members.map((m) => withPresence(m.user)),
-          lastMessage: last ? { text: previewText(last), createdAt: last.createdAt, senderId: last.senderId } : null,
-          updatedAt: last ? last.createdAt : c.createdAt,
-          unreadCount: countUnread(unread, me),
-        };
-      })
-    );
+    // One grouped query counts unread messages for every chat at once.
+    const unreadRows = await prisma.message.groupBy({
+      by: ['conversationId'],
+      where: { conversationId: { in: conversations.map((c) => c.id) }, senderId: { not: me }, readAt: null },
+      _count: { _all: true },
+    });
+    const unreadByChat = new Map(unreadRows.map((r) => [r.conversationId, r._count._all]));
+
+    const result = conversations.map((c) => {
+      const last = c.messages[0] || null;
+      return {
+        id: c.id,
+        isGroup: c.isGroup,
+        isGlobal: c.isGlobal,
+        name: c.name,
+        createdAt: c.createdAt,
+        members: c.members.map((m) => withPresence(m.user)),
+        lastMessage: last ? { text: previewText(last), createdAt: last.createdAt, senderId: last.senderId } : null,
+        updatedAt: last ? last.createdAt : c.createdAt,
+        unreadCount: unreadByChat.get(c.id) || 0,
+      };
+    });
 
     result.sort((a, b) => Number(b.isGlobal) - Number(a.isGlobal) || new Date(b.updatedAt) - new Date(a.updatedAt));
     res.json({ conversations: result });
