@@ -399,14 +399,19 @@ li.hand,
 
 .auth__actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
+  gap: 10px;
   margin-top: 20px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 .auth__actions .btn--cta {
-  width: auto;
+  width: 100%;
+}
+.auth__guest {
+  width: 100%;
+  text-align: center;
+  margin-top: 0;
 }
 .auth__or {
   color: var(--muted);
