@@ -11,7 +11,7 @@ const { joinGlobalChannel } = require('../lib/globalChannel');
 
 const router = express.Router();
 
-const SENDER_SELECT = { id: true, username: true, displayName: true, avatarColor: true, avatarUrl: true };
+const SENDER_SELECT = { id: true, username: true, displayName: true, avatarColor: true, avatarUrl: true, isGuest: true };
 
 // Stops anyone who is not a member from reading or posting.
 async function requireMember(conversationId, userId) {
