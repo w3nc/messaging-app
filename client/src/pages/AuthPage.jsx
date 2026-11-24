@@ -1,17 +1,23 @@
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth.jsx';
-import { ApiError } from '../api.js';
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth.jsx";
+import { ApiError } from "../api.js";
 
 export default function AuthPage({ mode }) {
-  const isSignup = mode === 'signup';
+  const isSignup = mode === "signup";
   const { signIn, signUp, continueAsGuest } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [form, setForm] = useState({ username: '', displayName: '', email: '', password: '', remember: false });
+  const [form, setForm] = useState({
+    username: "",
+    displayName: "",
+    email: "",
+    password: "",
+    remember: false,
+  });
   const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
 
   function update(field, value) {
@@ -22,7 +28,7 @@ export default function AuthPage({ mode }) {
   async function onSubmit(e) {
     e.preventDefault();
     setBusy(true);
-    setFormError('');
+    setFormError("");
     setErrors({});
     try {
       if (isSignup) {
@@ -33,13 +39,17 @@ export default function AuthPage({ mode }) {
           password: form.password,
         });
       } else {
-        await signIn({ email: form.email, password: form.password, remember: form.remember });
+        await signIn({
+          email: form.email,
+          password: form.password,
+          remember: form.remember,
+        });
       }
-      navigate(location.state?.from || '/chat', { replace: true });
+      navigate(location.state?.from || "/chat", { replace: true });
     } catch (err) {
       const fields = err instanceof ApiError ? err.fields : {};
       setErrors(fields || {});
-      setFormError(err.message || 'Something went wrong. Try again.');
+      setFormError(err.message || "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
@@ -47,12 +57,14 @@ export default function AuthPage({ mode }) {
 
   async function onGuest() {
     setBusy(true);
-    setFormError('');
+    setFormError("");
     try {
       await continueAsGuest();
-      navigate('/chat', { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
-      setFormError(err.message || 'Could not start a visitor session. Try again.');
+      setFormError(
+        err.message || "Could not start a visitor session. Try again.",
+      );
     } finally {
       setBusy(false);
     }
@@ -61,14 +73,32 @@ export default function AuthPage({ mode }) {
   return (
     <main className="auth">
       <section className="auth__form-side">
-        <h1 className="auth__title">{isSignup ? 'Create account' : 'Sign in'}</h1>
-        <p className="auth__sub">Pick up your conversations where you left them.</p>
+        <h1 className="auth__title">
+          {isSignup ? "Create account" : "Sign in"}
+        </h1>
+        <p className="auth__sub">
+          Pick up your conversations where you left them.
+        </p>
 
-        <div className="auth__switch-tabs" role="tablist" aria-label="Sign in or create account">
-          <Link role="tab" aria-selected={!isSignup} className={`auth__tab${!isSignup ? ' auth__tab--on' : ''}`} to="/login">
+        <div
+          className="auth__switch-tabs"
+          role="tablist"
+          aria-label="Sign in or create account"
+        >
+          <Link
+            role="tab"
+            aria-selected={!isSignup}
+            className={`auth__tab${!isSignup ? " auth__tab--on" : ""}`}
+            to="/login"
+          >
             Sign in
           </Link>
-          <Link role="tab" aria-selected={isSignup} className={`auth__tab${isSignup ? ' auth__tab--on' : ''}`} to="/signup">
+          <Link
+            role="tab"
+            aria-selected={isSignup}
+            className={`auth__tab${isSignup ? " auth__tab--on" : ""}`}
+            to="/signup"
+          >
             Create account
           </Link>
         </div>
@@ -80,7 +110,7 @@ export default function AuthPage({ mode }) {
                 id="username"
                 label="Username"
                 value={form.username}
-                onChange={(v) => update('username', v)}
+                onChange={(v) => update("username", v)}
                 error={errors.username}
                 autoComplete="username"
                 hint="3-20 letters, numbers, _ or ."
@@ -89,7 +119,7 @@ export default function AuthPage({ mode }) {
                 id="displayName"
                 label="Display name"
                 value={form.displayName}
-                onChange={(v) => update('displayName', v)}
+                onChange={(v) => update("displayName", v)}
                 error={errors.displayName}
                 autoComplete="name"
               />
@@ -100,7 +130,7 @@ export default function AuthPage({ mode }) {
             label="Email"
             type="email"
             value={form.email}
-            onChange={(v) => update('email', v)}
+            onChange={(v) => update("email", v)}
             error={errors.email}
             autoComplete="email"
           />
@@ -109,10 +139,10 @@ export default function AuthPage({ mode }) {
             label="Password"
             type="password"
             value={form.password}
-            onChange={(v) => update('password', v)}
+            onChange={(v) => update("password", v)}
             error={errors.password}
-            autoComplete={isSignup ? 'new-password' : 'current-password'}
-            hint={isSignup ? 'At least 8 characters' : undefined}
+            autoComplete={isSignup ? "new-password" : "current-password"}
+            hint={isSignup ? "At least 8 characters" : undefined}
           />
 
           {formError && (
@@ -127,7 +157,7 @@ export default function AuthPage({ mode }) {
                 <input
                   type="checkbox"
                   checked={form.remember}
-                  onChange={(e) => update('remember', e.target.checked)}
+                  onChange={(e) => update("remember", e.target.checked)}
                 />
                 <span>Keep me signed in</span>
               </label>
@@ -136,20 +166,37 @@ export default function AuthPage({ mode }) {
           )}
 
           <button className="btn btn--cta" type="submit" disabled={busy}>
-            {busy ? 'Please wait...' : isSignup ? 'Create account' : 'Sign in'}
+            {busy ? "Please wait..." : isSignup ? "Create account" : "Sign in"}
           </button>
         </form>
 
-        <button className="auth__guest" type="button" onClick={onGuest} disabled={busy}>
-          Stay logged out
+        <button
+          className="auth__guest"
+          type="button"
+          onClick={onGuest}
+          disabled={busy}
+        >
+          Continue without using an account
         </button>
       </section>
     </main>
   );
 }
 
-function Field({ id, label, type = 'text', value, onChange, error, hint, autoComplete }) {
-  const describedBy = [error ? `${id}-error` : null, hint ? `${id}-hint` : null].filter(Boolean).join(' ') || undefined;
+function Field({
+  id,
+  label,
+  type = "text",
+  value,
+  onChange,
+  error,
+  hint,
+  autoComplete,
+}) {
+  const describedBy =
+    [error ? `${id}-error` : null, hint ? `${id}-hint` : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
@@ -160,7 +207,7 @@ function Field({ id, label, type = 'text', value, onChange, error, hint, autoCom
         value={value}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
-        aria-invalid={error ? 'true' : undefined}
+        aria-invalid={error ? "true" : undefined}
         aria-describedby={describedBy}
       />
       {hint && !error && (
