@@ -331,6 +331,13 @@ export default function ChatPage() {
   const other = activeConvo ? chatOther(activeConvo, user && user.id) : null;
   const otherOnline = other ? other.online : false;
 
+  // Visitors ("Stay logged out" accounts) are left out of the members panel:
+  // they have no profile and no account to keep. The header count follows the
+  // same list so the number always matches what is shown.
+  const visibleMembers = activeConvo
+    ? activeConvo.members.filter((m) => !m.isGuest)
+    : [];
+
   // Friends who are online, shown in the left column.
   const onlineFriends = friends.filter((f) => f.online);
   // Online friends float to the top of the list.
@@ -496,7 +503,7 @@ export default function ChatPage() {
                 <strong>{chatTitle(activeConvo, user && user.id)}</strong>
                 <div className="muted small">
                   {activeConvo.isGroup
-                    ? `${activeConvo.members.length} members`
+                    ? `${visibleMembers.length} ${visibleMembers.length === 1 ? 'member' : 'members'}`
                     : otherOnline
                     ? 'Online now'
                     : 'Offline'}
@@ -617,7 +624,7 @@ export default function ChatPage() {
           <div className="card">
             <h2 className="section-title">Members</h2>
             <ul className="chat-list">
-              {activeConvo.members.map((m) => (
+              {visibleMembers.map((m) => (
                 <li key={m.id}>
                   <button
                     type="button"
